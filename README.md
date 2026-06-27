@@ -17,12 +17,13 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 <img width="1011" height="680" alt="image" src="https://github.com/user-attachments/assets/b11050d3-2301-4d6f-989d-7e64ca8778f5" />
 
 
-🧠 Karşılaştığım Sorunlar (Problems Encountered)
-Sorun: HQ_Router tüm konfigürasyonlar doğru olmasına rağmen dış dünyaya (Net bulutuna) ping atamıyor, paketler timeout yiyordu. Wireshark ile incelendiğinde, router'ın gönderdiği ARP ve DHCP isteklerine karşı taraftan (sanal modem/gateway) hiçbir cevap gelmediği görüldü.
+## 🧠 Karşılaştığım Sorunlar (Problems Encountered)
 
-Nedeni: Sorun Cisco komutlarında değil, simülatörün (PNet Lab) arka planındaydı. Üst üste yapılan denemeler yüzünden router ile bilgisayarın sanal ağ kartı (modem bağlantısı) arasındaki o görünmez köprü kilitlenmişti. Paketler fiziksel ağa ulaşamıyordu.
+*   ** Sorun: HQ_Router tüm konfigürasyonlar doğru olmasına rağmen dış dünyaya (Net bulutuna) ping atamıyor, paketler timeout yiyordu. Wireshark ile incelendiğinde, router'ın gönderdiği ARP ve DHCP isteklerine karşı taraftan (sanal modem/gateway) hiçbir cevap gelmediği görüldü.
 
-Çözüm: Router ile bulut arasındaki kablo tamamen silindi ve yeniden bağlandı. Bu basit sanal "sök-tak" işlemi kilitlenen köprüyü sıfırladı; router modemi algılayıp tıkır tıkır IP'sini aldı ve internet kapısı açıldı.
+*   ** Nedeni: Sorun Cisco komutlarında değil, simülatörün (PNet Lab) arka planındaydı. Üst üste yapılan denemeler yüzünden router ile bilgisayarın sanal ağ kartı (modem bağlantısı) arasındaki o görünmez köprü kilitlenmişti. Paketler fiziksel ağa ulaşamıyordu.
+
+*   ** Çözüm: Router ile bulut arasındaki kablo tamamen silindi ve yeniden bağlandı. Bu basit sanal "sök-tak" işlemi kilitlenen köprüyü sıfırladı; router modemi algılayıp tıkır tıkır IP'sini aldı ve internet kapısı açıldı.
 
 *Released: 27.06.2026*
 
