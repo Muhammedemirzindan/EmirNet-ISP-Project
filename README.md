@@ -16,7 +16,6 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 ### 📊 v0.2 Topoloji ve Doğrulama
 <img width="1011" height="680" alt="image" src="https://github.com/user-attachments/assets/b11050d3-2301-4d6f-989d-7e64ca8778f5" />
 
-
 ## 🧠 Karşılaştığım Sorunlar (Problems Encountered)
 
 *   Sorun: HQ_Router tüm konfigürasyonlar doğru olmasına rağmen dış dünyaya (Net bulutuna) ping atamıyor, paketler timeout yiyordu. Wireshark ile incelendiğinde, router'ın gönderdiği ARP ve DHCP isteklerine karşı taraftan (sanal modem/gateway) hiçbir cevap gelmediği görüldü.
