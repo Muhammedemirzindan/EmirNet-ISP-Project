@@ -26,6 +26,7 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 
 *Released: 27.06.2026*
 
+
 ## 🚀 Sürüm: v0.1 - Çekirdek Kurulum (HQ Genesis)
 
 Bu ilk sürümde, EmirNet Genel Merkez (HQ) ofisinin en temel ağ çekirdeği simüle edilmiştir. Amaç, altyapının merkez omurgasını ve dinamik adresleme mekanizmasını doğrulamaktır.
