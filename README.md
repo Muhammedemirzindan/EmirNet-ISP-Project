@@ -3,6 +3,37 @@
 Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
 
 ---
+## 🚀 Sürüm: v0.3 - Metro Ethernet Toplama Altyapısı ve Kurumsal Müşteri Aktivasyonu (The Corporate Dawn)
+
+Bu sürümde, EmirNet yerel bir ağ laboratuvarı modelinden çıkarak gerçek bir İnternet Servis Sağlayıcı (ISP) omurgasına dönüştürülmüştür. Şirket içi yönetim ağı ile kurumsal müşteri trafiği hem fiziksel hem de mantıksal (VLAN) olarak tamamen izole edilmiş; sanal alt arayüz (Sub-interface) mimarisiyle tek bir fiziksel hat üzerinden güvenli ve bağımsız internet akışı başarıyla doğrulanmıştır.
+
+### 🛠️ Bu Sürümde Neler Yapıldı?
+
+*   **Profesyonel Kurumsal Kimlik (Naming Standartları):** Sektör standardı mimarilere geçiş yapılarak cihazlar EmirNet-PE-01 (Provider Edge), EmirNet-AGG-01 (Aggregation Switch) ve Customer1-CE-01 (Customer Edge) olarak yeniden isimlendirildi.
+
+*   **Fiziksel ve Mantıksal İzolasyon (HQ LAN Ayrımı):** EmirNet genel merkez bilgisayarları (HQ), güvenlik ve operasyonel rol ayrımı gereği toplama switch'inden alınarak tamamen bağımsız bir katmana, EmirNet-HQ-SW-01 switch'i altına taşındı.
+
+*   **Genişletilebilir IP ve VLAN Matrisi:** İleride yapılacak rota özetlemeye (Route Aggregation) uygun, 10.10.X.X/30 tabanlı bir WAN otobanı kurgulandı. İlk kurumsal müşteri için VLAN 20 ve 10.10.10.0/30 bloğu tanımlandı.
+
+*   **Sub-Interface (Sanal Bölümleme) Entegrasyonu:** EmirNet-PE-01 router'ının ana fiziksel portu (Gi0/0) yazılımsal olarak dilimlere ayrıldı (Gi0/0.10 ve Gi0/0.20). Bu sayede tek bir kablo içinden hem şirket içi trafik hem de müşteri trafiği birbirine sızmadan taşındı.
+
+*   **İlk Kurumsal İnternet Erişimi (Milestone):** Customer1-PC-1 cihazından küresel internete (8.8.8.8) atılan pinglerin başarıyla dönmesiyle hat aktif edildi. Müşterinin iç ağımızdaki kritik IP bloklarına erişimi engellenerek tam izolasyon doğrulandı.
+
+### 📊 v0.3 Topoloji ve Doğrulama Hatları
+<img width="1810" height="799" alt="image" src="https://github.com/user-attachments/assets/6cd5bc57-73b9-445c-82f7-c838d2beabf7" />
+
+## 🧠 Karşılaştığım Sorunlar (Problems Encountered) —
+
+*   Sorun: Kurumsal müşteri tarafındaki bilgisayar (Customer1-PC-1) kendi ağındaki gateway'e ve ISP bacağına ping atabilirken, dış dünyaya (8.8.8.8) erişmeye çalıştığında paketler timeout yiyordu.
+
+*   Nedeni: EmirNet-PE-01 (ISP Router) ile Customer1-CE-01 (Müşteri Router) arasında fiziksel hat aktif edilmiş ve IP'ler verilmiş olmasına rağmen, ISP router'ının müşterinin iç yerel ağına (192.168.20.0/24) giden yolu bilmemesiydi. Paket internete çıksa bile, dönüş trafiğinde ISP router'ı hedef adresi tanımadığı için paketleri düşürüyordu.
+
+*   Çözüm: EmirNet-PE-01 router'ı üzerinde, müşteri iç ağına doğru statik bir yönlendirme rotası tanımlandı.
+
+*Released: 28.06.2026*
+
+
+---
 ## 🚀 Sürüm: v0.2 - WAN Entegrasyonu ve NAT Kurulumu (HQ Connect)
 
 Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel internete) bağlantısı başarıyla simüle edilmiştir. Amaç, iç ağdaki özel IP adresine sahip cihazların tek bir çıkış noktasından internete erişmesini sağlamak ve NAT (Network Address Translation) mekanizmasını doğrulamaktır.
@@ -27,6 +58,7 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 *Released: 27.06.2026*
 
 
+---
 ## 🚀 Sürüm: v0.1 - Çekirdek Kurulum (HQ Genesis)
 
 Bu ilk sürümde, EmirNet Genel Merkez (HQ) ofisinin en temel ağ çekirdeği simüle edilmiştir. Amaç, altyapının merkez omurgasını ve dinamik adresleme mekanizmasını doğrulamaktır.
