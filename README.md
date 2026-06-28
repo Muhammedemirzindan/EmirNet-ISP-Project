@@ -30,6 +30,9 @@ Bu sürümde, EmirNet yerel bir ağ laboratuvarı modelinden çıkarak gerçek b
 
 *   Çözüm: EmirNet-PE-01 router'ı üzerinde, müşteri iç ağına doğru statik bir yönlendirme rotası tanımlandı.
 
+💡 Geliştirici Notu
+Bugün bir şey fark ettim: Ben bu iş üzerine çalışmayı gerçekten çok seviyorum. Sıfırdan bir şeyler üretmek, laboratuvarı adım adım geliştirmek ve sistemin büyüdüğünü görmek mutluluk veriyor. İleride ne kadar başarılı olurum ya da bu yol beni nereye götürür bilmiyorum ama bildiğim tek bir şey var, ben bu işi yaparken kendimi buluyorum ve bu yolda devam edeceğim.
+
 *Released: 28.06.2026*
 
 
