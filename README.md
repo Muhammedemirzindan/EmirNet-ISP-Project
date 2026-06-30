@@ -3,6 +3,57 @@
 Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
 
 ---
+## 🚀 Sürüm: v0.4 - Dağıtık Altyapıdan Merkezi Linux DHCP Yönetimine Geçiş ve Omurga Ölçekleme (The Centralized Core)
+
+Bu sürümde EmirNet, router üzerinde çalışan yerel DHCP servisinden merkezi Linux tabanlı DHCP mimarisine geçirilmiştir. IP dağıtımı ağ cihazından ayrılarak bağımsız bir sunucuya taşınmış, farklı VLAN'lardaki istemcilerin DHCP Relay (ip helper-address) mekanizması ile tek bir merkezi DHCP sunucusundan dinamik IP adresi alması sağlanmıştır. Böylece ağ yönetimi daha ölçeklenebilir ve gerçek ISP mimarisine daha uygun hale getirilmiştir.
+
+🛠️ Bu Sürümde Neler Yapıldı?
+
+*   **Merkezi Linux DHCP Sunucusu:** Ubuntu Server üzerinde isc-dhcp-server kurulmuş ve EmirNet ağı için merkezi DHCP hizmeti devreye alınmıştır.
+
+*   **Router DHCP'den Merkezi Sunucuya Geçiş:** HQ tarafında router üzerinde çalışan DHCP servisi kaldırılarak IP dağıtım görevi tamamen Linux sunucusuna taşınmıştır.
+
+*   **Yeni Sunucu VLAN'ı:** DHCP sunucusunu istemci ağlarından mantıksal olarak ayırmak amacıyla yeni bir VLAN 30 oluşturulmuştur.
+- PE Router üzerinde Gi0/0.30 sub-interface oluşturuldu.
+- Aggregation Switch üzerinde VLAN 30 ile eşleştirildi.
+- Linux DHCP Server bu VLAN içerisine konumlandırıldı.
+
+*   **Çoklu DHCP Havuzları (Multi-Subnet Pools):** Merkezi DHCP sunucusu üzerinde üç farklı ağ için bağımsız IP havuzları oluşturuldu. Her VLAN kendi gateway, DNS ve IP dağıtım aralığına sahip olacak şekilde yapılandırıldı.
+- VLAN 10 → 192.168.1.0/24
+- VLAN 20 → 192.168.20.0/24
+- VLAN 30 → 192.168.30.0/24
+
+*   **DHCP Relay (IP Helper Address):** Router üzerinde ip helper-address yapılandırılarak farklı VLAN'lardaki DHCP Discover yayınlarının merkezi DHCP sunucusuna yönlendirilmesi sağlandı.
+
+*   **Merkezi IP Yönetimi:** 
+- IP adresi
+- Subnet Mask
+- Default Gateway
+- DNS Server
+istemcilerin bu bilgileri DHCP üzerinden otomatik dağıtılacak şekilde yapılandırıldı.
+
+### 📊 v0.4 Topoloji ve Doğrulama Hatları
+<img width="1912" height="755" alt="image" src="https://github.com/user-attachments/assets/ead624c7-567c-4e6f-978b-883a9c41ec77" />
+
+### 🧠 Karşılaşılan Sorunlar (Problems Encountered) — v0.4
+
+*   **Sorun:** Projeye merkezi bir Linux DHCP Server eklemek amacıyla Ubuntu Server, PNETLab topolojisine dahil edildi ve statik IP adresi (192.168.30.5) yapılandırıldı. Ancak isc-dhcp-server paketini kurmak için gerekli olan apt update ve apt install işlemleri normal çalışmıyordu. Paket indirme hızı yaklaşık 750 B/s seviyesinde kalıyor, daha sonra ise işlemler tamamen "Waiting for headers" aşamasında takılıyordu. Ubuntu paket kaynaklarının Türkiye (TR) mirror'larına yönlendirilmesi de sorunu çözmedi.
+Sorunun paket yöneticisinden kaynaklandığı düşünülerek Ubuntu 22.04'e geçildi ve ek paket gerektirmeyen systemd-networkd kullanılarak DHCP sunucusu kurulmaya çalışıldı. Yapılan yapılandırmalar sonucunda DHCP Discover paketlerine cevap üretilebilse de DHCP Offer paketleri istemciye ulaşmadı ve istemciler dinamik IP adresi alamadı.
+
+*   **Nedeni:** Yapılan testler sonucunda problemin DHCP protokolünden değil, PNETLab içerisindeki Linux node'unun internet erişim yapısından kaynaklandığı anlaşıldı. Aynı Ubuntu Server imajı VMware üzerinde bağımsız bir sanal makine olarak çalıştırıldığında sistem doğrudan modemden IP adresi aldı ve tüm paketler normal hızda indirilebildi. Bu durum, işletim sistemi veya paket yöneticisinden ziyade PNETLab içerisindeki Linux node'unun internet bağlantısının sorunlu olduğunu gösterdi.
+
+*   **Çözüm:** VMware üzerinde yapılan testten elde edilen sonuç doğrultusunda PNETLab topolojisine yeni bir Linux node eklendi ve ayrı bir ManagementCloud0 bağlantısı oluşturularak sunucunun doğrudan modem üzerinden internete erişmesi sağlandı. Bu yapılandırmanın ardından apt update ve isc-dhcp-server kurulumu sorunsuz şekilde tamamlandı. Sonrasında DHCP havuzları yapılandırıldı, sunucuya statik IP adresi atandı, gerekli servis ayarları tamamlandı ve router üzerinde DHCP Relay (ip helper-address) yapılandırılarak istemcilerin farklı VLAN'lardan dinamik IP adresi alması başarıyla sağlandı.
+
+*   **Kazanım:** Bu süreç yaklaşık 8 saatlik troubleshooting çalışması gerektirdi. Sorun ilk bakışta DHCP veya Ubuntu kaynaklı gibi görünmesine rağmen, yapılan adım adım testler sayesinde problemin sanallaştırma ortamı ve ağ mimarisinden kaynaklandığı tespit edildi. Bu çalışma sayesinde yalnızca merkezi bir DHCP servisi devreye alınmadı; aynı zamanda problem çözme, izolasyon testi (VMware ve PNETLab karşılaştırması), Linux servis yönetimi ve ağ altyapısı analizi konularında önemli deneyim kazanıldı.
+
+### 🎯 Kazanımlar
+
+Bu sürümle birlikte EmirNet yalnızca paket ileten bir ağ olmaktan çıkıp, istemcilere ağ hizmeti sağlayan gerçek bir servis altyapısına dönüşmeye başlamıştır. Merkezi DHCP mimarisi sayesinde IP yönetimi kolaylaştırılmış, ağın ölçeklenebilirliği artırılmış ve ileride eklenecek DNS, NTP, AAA ve diğer merkezi servisler için gerekli temel altyapı hazırlanmıştır.
+
+*Released: 30.06.2026*
+
+
+---
 ## 🚀 Sürüm: v0.3 - Metro Ethernet Toplama Altyapısı ve Kurumsal Müşteri Aktivasyonu (The Corporate Dawn)
 
 Bu sürümde, EmirNet yerel bir ağ laboratuvarı modelinden çıkarak gerçek bir İnternet Servis Sağlayıcı (ISP) omurgasına dönüştürülmüştür. Şirket içi yönetim ağı ile kurumsal müşteri trafiği hem fiziksel hem de mantıksal (VLAN) olarak tamamen izole edilmiş; sanal alt arayüz (Sub-interface) mimarisiyle tek bir fiziksel hat üzerinden güvenli ve bağımsız internet akışı başarıyla doğrulanmıştır.
@@ -22,7 +73,7 @@ Bu sürümde, EmirNet yerel bir ağ laboratuvarı modelinden çıkarak gerçek b
 ### 📊 v0.3 Topoloji ve Doğrulama Hatları
 <img width="1810" height="799" alt="image" src="https://github.com/user-attachments/assets/6cd5bc57-73b9-445c-82f7-c838d2beabf7" />
 
-## 🧠 Karşılaştığım Sorunlar (Problems Encountered) —
+## 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.3
 
 *   Sorun: Kurumsal müşteri tarafındaki bilgisayar (Customer1-PC-1) kendi ağındaki gateway'e ve ISP bacağına ping atabilirken, dış dünyaya (8.8.8.8) erişmeye çalıştığında paketler timeout yiyordu.
 
@@ -47,7 +98,7 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 ### 📊 v0.2 Topoloji ve Doğrulama
 <img width="1011" height="680" alt="image" src="https://github.com/user-attachments/assets/b11050d3-2301-4d6f-989d-7e64ca8778f5" />
 
-## 🧠 Karşılaştığım Sorunlar (Problems Encountered)
+## 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.2
 
 *   Sorun: HQ_Router tüm konfigürasyonlar doğru olmasına rağmen dış dünyaya (Net bulutuna) ping atamıyor, paketler timeout yiyordu. Wireshark ile incelendiğinde, router'ın gönderdiği ARP ve DHCP isteklerine karşı taraftan (sanal modem/gateway) hiçbir cevap gelmediği görüldü.
 
