@@ -14,22 +14,33 @@ Bu sürümde EmirNet, router üzerinde çalışan yerel DHCP servisinden merkezi
 *   **Router DHCP'den Merkezi Sunucuya Geçiş:** HQ tarafında router üzerinde çalışan DHCP servisi kaldırılarak IP dağıtım görevi tamamen Linux sunucusuna taşınmıştır.
 
 *   **Yeni Sunucu VLAN'ı:** DHCP sunucusunu istemci ağlarından mantıksal olarak ayırmak amacıyla yeni bir VLAN 30 oluşturulmuştur.
+
 -PE Router üzerinde Gi0/0.30 sub-interface oluşturuldu.
+
 -Aggregation Switch üzerinde VLAN 30 ile eşleştirildi.
+
 -Linux DHCP Server bu VLAN içerisine konumlandırıldı.
 
 *   **Çoklu DHCP Havuzları (Multi-Subnet Pools):** Merkezi DHCP sunucusu üzerinde üç farklı ağ için bağımsız IP havuzları oluşturuldu. Her VLAN kendi gateway, DNS ve IP dağıtım aralığına sahip olacak şekilde yapılandırıldı.
+
 -VLAN 10 → 192.168.1.0/24
+
 -VLAN 20 → 192.168.20.0/24
+
 -VLAN 30 → 192.168.30.0/24
 
 *   **DHCP Relay (IP Helper Address):** Router üzerinde ip helper-address yapılandırılarak farklı VLAN'lardaki DHCP Discover yayınlarının merkezi DHCP sunucusuna yönlendirilmesi sağlandı.
 
-*   **Merkezi IP Yönetimi:** 
+*   **Merkezi IP Yönetimi:**
+
 -IP adresi
+
 -Subnet Mask
+
 -Default Gateway
+
 -DNS Server
+
 İstemcilerin bu bilgileri DHCP üzerinden otomatik dağıtılacak şekilde yapılandırıldı.
 
 ### 📊 v0.4 Topoloji ve Doğrulama Hatları
