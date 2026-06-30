@@ -14,23 +14,23 @@ Bu sürümde EmirNet, router üzerinde çalışan yerel DHCP servisinden merkezi
 *   **Router DHCP'den Merkezi Sunucuya Geçiş:** HQ tarafında router üzerinde çalışan DHCP servisi kaldırılarak IP dağıtım görevi tamamen Linux sunucusuna taşınmıştır.
 
 *   **Yeni Sunucu VLAN'ı:** DHCP sunucusunu istemci ağlarından mantıksal olarak ayırmak amacıyla yeni bir VLAN 30 oluşturulmuştur.
-- PE Router üzerinde Gi0/0.30 sub-interface oluşturuldu.
-- Aggregation Switch üzerinde VLAN 30 ile eşleştirildi.
-- Linux DHCP Server bu VLAN içerisine konumlandırıldı.
+-PE Router üzerinde Gi0/0.30 sub-interface oluşturuldu.
+-Aggregation Switch üzerinde VLAN 30 ile eşleştirildi.
+-Linux DHCP Server bu VLAN içerisine konumlandırıldı.
 
 *   **Çoklu DHCP Havuzları (Multi-Subnet Pools):** Merkezi DHCP sunucusu üzerinde üç farklı ağ için bağımsız IP havuzları oluşturuldu. Her VLAN kendi gateway, DNS ve IP dağıtım aralığına sahip olacak şekilde yapılandırıldı.
-- VLAN 10 → 192.168.1.0/24
-- VLAN 20 → 192.168.20.0/24
-- VLAN 30 → 192.168.30.0/24
+-VLAN 10 → 192.168.1.0/24
+-VLAN 20 → 192.168.20.0/24
+-VLAN 30 → 192.168.30.0/24
 
 *   **DHCP Relay (IP Helper Address):** Router üzerinde ip helper-address yapılandırılarak farklı VLAN'lardaki DHCP Discover yayınlarının merkezi DHCP sunucusuna yönlendirilmesi sağlandı.
 
 *   **Merkezi IP Yönetimi:** 
-- IP adresi
-- Subnet Mask
-- Default Gateway
-- DNS Server
-istemcilerin bu bilgileri DHCP üzerinden otomatik dağıtılacak şekilde yapılandırıldı.
+-IP adresi
+-Subnet Mask
+-Default Gateway
+-DNS Server
+İstemcilerin bu bilgileri DHCP üzerinden otomatik dağıtılacak şekilde yapılandırıldı.
 
 ### 📊 v0.4 Topoloji ve Doğrulama Hatları
 <img width="1912" height="755" alt="image" src="https://github.com/user-attachments/assets/ead624c7-567c-4e6f-978b-883a9c41ec77" />
@@ -121,5 +121,6 @@ Bu ilk sürümde, EmirNet Genel Merkez (HQ) ofisinin en temel ağ çekirdeği si
 
 ### 📊 v0.1 Topoloji ve Doğrulama
 <img width="1653" height="733" alt="image" src="https://github.com/user-attachments/assets/938abfc4-9000-45a4-8c4c-bae61a9e94f8" />
+
 *Released: 25.06.2026*
 
