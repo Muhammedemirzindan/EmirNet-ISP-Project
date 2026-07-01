@@ -18,7 +18,7 @@ Bu sürümde, EmirNet ISP omurgası ile müşteri arasındaki statik ve hantal y
 
 *   **Paket Seviyesinde Doğrulama (Wireshark Telemetry - Milestone):** Canlı hat üzerinden paket yakalama (packet capture) işlemi başlatılarak OSPF operasyonu izlenmiştir. Router'lar arası linkte 224.0.0.5 multicast adresine her 10 saniyede bir gönderilen Hello paketleri ve "Heartbeat" (canlı kalma) sinyalleri doğrulanmıştır. passive-interface yapılan bacaklarda ise tek bir paket akmadığı gözlemlenerek izolasyon başarıyla set edilmiştir.
 
-### 📊 v0.4 Topoloji ve Doğrulama Hatları
+### 📊 v0.5 Topoloji ve Doğrulama Hatları
 <img width="1653" height="1030" alt="image" src="https://github.com/user-attachments/assets/658397f7-bdb3-4234-b1aa-8d0e7f0ade2e" />
 
 ### 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.5
