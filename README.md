@@ -3,11 +3,41 @@
 Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
 
 ---
+## 🚀 Sürüm: v0.5 - Dinamik Yönlendirme Omurgası, Kimlik Yönetimi ve Altyapı Optimizasyonu (The Dynamic Core)
+Bu sürümde, EmirNet ISP omurgası ile müşteri arasındaki statik ve hantal yönlendirme yapısı tamamen terk edilerek, endüstri standardı olan dinamik yönlendirme mimarisine geçiş yapılmıştır. Ağın ölçeklenebilirliği, güvenliği ve kararlılığı paket seviyesinde doğrulanmış; altyapı insan müdahalesine gerek duymadan kendi rotasını çizebilecek seviyeye ulaştırılmıştır.
+
+### 🛠️ Bu Sürümde Neler Yapıldı?
+
+*   **Dinamik Omurga Entegrasyonu (OSPF Single-Area 0):**  EmirNet-PE-01 ile Customer1-CE-01 router'ları arasında OSPF (Open Shortest Path First) protokolü devreye alınmıştır. Statik rotalar tamamen silinerek, müşteri iç ağları ve ISP servis blokları dinamik olarak haritalandırılmış ve ağlar arası yakınsama (convergence) milisaniyeler seviyesine indirilmiştir.
+
+*   **Deterministic Kimlik Yönetimi (Router-ID Hardening):** OSPF sürecinin ağdaki IP değişikliklerinden etkilenerek çökmesini (SPF recalculation) önlemek adına, router'ların kimlikleri otomatik seçimden çıkarılmıştır. EmirNet-PE-01 için 1.1.1.1, Customer1-CE-01 için 2.2.2.2 Router-ID'leri el ile (manually) atanarak altyapı kimlik mimarisi sabitlenmiştir.
+
+*   **Hizmet Dağıtım Otomasyonu (Default Route Origination):** Müşteri tarafının internete çıkabilmesi için kurulan statik tanımlamalar modernize edilmiştir. PE router üzerinde üretilen default route, OSPF protokolü içerisinden default-information originate komutuyla müşteri router'ına dinamik bir enjeksiyonla aktarılmıştır.
+
+*   **Ağ Güvenliği ve Trafik Optimizasyonu (Passive-Interface):** OSPF Hello paketlerinin, router bulunmayan ve sadece son kullanıcı/sunucu barındıran LAN bacaklarına fırlatılması engellenmiştir. İlgili arayüzler passive-interface olarak set edilerek hem gereksiz CPU/bant genişliği tüketimi sıfırlanmış hem de son kullanıcı bacağından gelebilecek sahte OSPF paket tehlikeleri (routing poisoning) bloke edilmiştir.
+
+*   **Paket Seviyesinde Doğrulama (Wireshark Telemetry - Milestone):** Canlı hat üzerinden paket yakalama (packet capture) işlemi başlatılarak OSPF operasyonu izlenmiştir. Router'lar arası linkte 224.0.0.5 multicast adresine her 10 saniyede bir gönderilen Hello paketleri ve "Heartbeat" (canlı kalma) sinyalleri doğrulanmıştır. passive-interface yapılan bacaklarda ise tek bir paket akmadığı gözlemlenerek izolasyon başarıyla set edilmiştir.
+
+### 📊 v0.4 Topoloji ve Doğrulama Hatları
+<img width="1653" height="1030" alt="image" src="https://github.com/user-attachments/assets/658397f7-bdb3-4234-b1aa-8d0e7f0ade2e" />
+
+### 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.5
+
+*   Sorun: Router-ID tanımlamaları yapılmasına ve konfigürasyonun kaydedilmesine rağmen, show ip ospf neighbor çıktısında komşuluk kimlikleri hâlâ eski arayüz IP'leri olarak görünmeye devam ediyordu.
+
+*   Nedeni: Cisco IOS mimarisinde canlıda çalışan bir OSPF süreci (process) varken yapılan Router-ID değişikliklerinin mevcut komşulukları kesintiye uğratmamak adına anında devreye girmemesidir. Cihaz, eski kimlik tablosunu hafızada tutmaya devam ediyordu.
+
+*   Çözüm: Operasyon modunda clear ip ospf process komutu tetiklenerek OSPF bellek tabloları temizlenmiş ve komşulukların yeni kimliklerle (1.1.1.1 ve 2.2.2.2) sıfır hata ile yeniden kurulması sağlanmıştır.
+
+*Released: 01.07.2026*
+
+
+---
 ## 🚀 Sürüm: v0.4 - Dağıtık Altyapıdan Merkezi Linux DHCP Yönetimine Geçiş ve Omurga Ölçekleme (The Centralized Core)
 
 Bu sürümde EmirNet, router üzerinde çalışan yerel DHCP servisinden merkezi Linux tabanlı DHCP mimarisine geçirilmiştir. IP dağıtımı ağ cihazından ayrılarak bağımsız bir sunucuya taşınmış, farklı VLAN'lardaki istemcilerin DHCP Relay (ip helper-address) mekanizması ile tek bir merkezi DHCP sunucusundan dinamik IP adresi alması sağlanmıştır. Böylece ağ yönetimi daha ölçeklenebilir ve gerçek ISP mimarisine daha uygun hale getirilmiştir.
 
-🛠️ Bu Sürümde Neler Yapıldı?
+### 🛠️ Bu Sürümde Neler Yapıldı?
 
 *   **Merkezi Linux DHCP Sunucusu:** Ubuntu Server üzerinde isc-dhcp-server kurulmuş ve EmirNet ağı için merkezi DHCP hizmeti devreye alınmıştır.
 
@@ -84,7 +114,7 @@ Bu sürümde, EmirNet yerel bir ağ laboratuvarı modelinden çıkarak gerçek b
 ### 📊 v0.3 Topoloji ve Doğrulama Hatları
 <img width="1810" height="799" alt="image" src="https://github.com/user-attachments/assets/6cd5bc57-73b9-445c-82f7-c838d2beabf7" />
 
-## 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.3
+### 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.3
 
 *   Sorun: Kurumsal müşteri tarafındaki bilgisayar (Customer1-PC-1) kendi ağındaki gateway'e ve ISP bacağına ping atabilirken, dış dünyaya (8.8.8.8) erişmeye çalıştığında paketler timeout yiyordu.
 
@@ -109,7 +139,7 @@ Bu sürümde, EmirNet Genel Merkez (HQ) ofisinin dış dünyaya (küresel intern
 ### 📊 v0.2 Topoloji ve Doğrulama
 <img width="1011" height="680" alt="image" src="https://github.com/user-attachments/assets/b11050d3-2301-4d6f-989d-7e64ca8778f5" />
 
-## 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.2
+### 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.2
 
 *   Sorun: HQ_Router tüm konfigürasyonlar doğru olmasına rağmen dış dünyaya (Net bulutuna) ping atamıyor, paketler timeout yiyordu. Wireshark ile incelendiğinde, router'ın gönderdiği ARP ve DHCP isteklerine karşı taraftan (sanal modem/gateway) hiçbir cevap gelmediği görüldü.
 
