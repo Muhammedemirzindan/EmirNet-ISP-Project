@@ -23,11 +23,11 @@ Bu sürümde, EmirNet ISP omurgası ile müşteri arasındaki statik ve hantal y
 
 ### 🧠 Karşılaştığım Sorunlar (Problems Encountered) - v0.5
 
-*   Sorun: Router-ID tanımlamaları yapılmasına ve konfigürasyonun kaydedilmesine rağmen, show ip ospf neighbor çıktısında komşuluk kimlikleri hâlâ eski arayüz IP'leri olarak görünmeye devam ediyordu.
+*   Sorun: OSPF yapılandırması eksiksiz tamamlanmasına ve komşuluk ilişkileri kurulmasına rağmen, show ip route yönlendirme tablosunda dinamik OSPF rotaları yerine hâlâ eski statik rotaların (S) baskın olduğu ve trafiğin bu statik hatlar üzerinden aktığı gözlemlendi.
 
-*   Nedeni: Cisco IOS mimarisinde canlıda çalışan bir OSPF süreci (process) varken yapılan Router-ID değişikliklerinin mevcut komşulukları kesintiye uğratmamak adına anında devreye girmemesidir. Cihaz, eski kimlik tablosunu hafızada tutmaya devam ediyordu.
+*   Nedeni: v0.3 sürümünde el ile yazılan statik rotaların silinmesinin unutulmasıdır. Cisco IOS mimarisinde statik rotaların İdari Mesafe (Administrative Distance) değeri 1 iken, OSPF'in değeri 110'dur. Cihaz daha güvenilir (AD değeri daha düşük) gördüğü için eski statik rotaları tabloda tutmaya devam etmiş ve OSPF rotalarının devreye girmesini engellemiştir.
 
-*   Çözüm: Operasyon modunda clear ip ospf process komutu tetiklenerek OSPF bellek tabloları temizlenmiş ve komşulukların yeni kimliklerle (1.1.1.1 ve 2.2.2.2) sıfır hata ile yeniden kurulması sağlanmıştır.
+*   Çözüm: Konfigürasyon moduna girilerek eski statik yönlendirme komutları no ip route ... şeklinde sistemden tamamen temizlenmiştir. Bu işlemin ardından yönlendirme tablosu anında güncellenmiş ve dinamik OSPF rotaları (O) baskın hale gelerek trafiği başarıyla devralmıştır.
 
 *Released: 01.07.2026*
 
