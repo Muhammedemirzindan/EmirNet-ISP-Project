@@ -3,6 +3,34 @@
 Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
 
 ---
+## 🚀 Sürüm: v0.6 - Bölgesel Genişleme, Çok Şehirli Omurga ve Dağıtık Servis Entegrasyonu (The Distributed Core)
+Bu sürümde EmirNet, tek bir bölgede hizmet veren lokal bir ağ yapısından çıkarak şehirler arası (inter-city) hizmet sunabilen çok şehirli ve dağıtık bir ISP omurgasına dönüştürülmüştür. Altyapıya Ankara POP (Point of Presence) noktası eklenmiş, dinamik yönlendirme omurgası genişletilmiş ve merkezi servislerin uzak lokasyonlardaki istemcilere ulaştırılması paket seviyesinde doğrulanmıştır. Topolojinin büyümesiyle birlikte mimari tutarlılığı korumak amacıyla cihaz isimlendirme standartları (Naming Conventions) yeniden düzenlenmiştir.
+
+### 🛠️ Bu Sürümde Neler Yapıldı?
+
+*   **Bölgesel Genişleme (Ankara POP Noktası):** Altyapıya Ankara bölgesini temsil eden yeni bir POP (Point of Presence) noktası eklenmiştir. Yeni lokasyonda yönlendirme ve anahtarlama altyapısı oluşturulmuş, IP adresleme planı genişletilmiş ve topolojinin büyümesiyle birlikte tüm cihaz isimlendirmeleri standart bir ISP hiyerarşisine uygun olacak şekilde yeniden düzenlenmiştir.
+
+*   **Çok Şehirli Dinamik Omurga (Inter-City OSPF):** İstanbul ve Ankara POP noktaları arasındaki omurga bağlantıları OSPF Single-Area 0 mimarisi üzerine genişletilmiştir. Yeni lokasyona ait ağlar dinamik olarak omurgaya dahil edilmiş, şehirler arası yönlendirme tablolarının otomatik senkronizasyonu sağlanmış ve ağ yakınsaması (Convergence) tamamen dinamik hale getirilmiştir.
+
+*   **Merkezi DHCP'nin Uzak Bölgeye Taşınması (DHCP Relay Over WAN):** Ankara'daki istemci ağlarının IP ihtiyacını karşılamak amacıyla İstanbul'da çalışan Linux DHCP sunucusu (isc-dhcp-server) üzerinde yeni bir IP havuzu (Pool) oluşturulmuştur. Ankara router'ı üzerinde ip helper-address yapılandırılarak DHCP Discover yayın paketleri Unicast'e dönüştürülmüş ve OSPF omurgası üzerinden merkezi DHCP sunucusuna başarıyla iletilmiştir. Böylece uzak lokasyondaki istemcilerin merkezi DHCP servisinden dinamik IP alması sağlanmıştır.
+
+*   **Bölgesel İnternet Çıkışı ve Trafik Dağılımı (Ankara NAT):** Ankara POP noktasındaki istemcilerin internet trafiğinin İstanbul omurgasına gereksiz yük oluşturmaması amacıyla Ankara çıkışında yerel NAT (Network Address Translation) mekanizması devreye alınmıştır. Böylece Ankara istemcileri internete kendi bölgesel çıkış noktaları üzerinden erişebilir hale getirilmiş ve trafik dağılımı optimize edilmiştir.
+
+### 📊 v0.6 Topoloji ve Doğrulama Hatları
+<img width="967" height="742" alt="image" src="https://github.com/user-attachments/assets/0d899cab-b1f6-44a8-a001-78e2973cf332" />
+<img width="1355" height="682" alt="image" src="https://github.com/user-attachments/assets/4feae995-92a7-43eb-bb27-541b332c4339" />
+
+### 🧠 Karşılaşılan Sorunlar (Problems Encountered) - v0.6
+
+*   Sorun: Ankara POP noktası için Linux DHCP üzerinde yeni havuz (pool) tanımlanıp, router'da ip helper-address yapılandırılmasına rağmen istemciler IP alamıyordu. Ağda ping sorunu yoktu fakat Wireshark incelemesinde paketlerin DHCP Discover aşamasında takıldığı görüldü.
+
+*   Nedeni: Linux üzerindeki dhcpd.conf dosyasına yeni Ankara havuzu eklenip kaydedilmesine rağmen, arka planda çalışan isc-dhcp-server servisine restart atılmamasıdır. Servis bellekte eski konfigürasyonla dönmeye devam ettiği için yeni havuzu tanımıyor ve gelen isteklere cevap (Offer) üretemiyordu.
+
+*   Çözüm: Linux terminalinde sudo systemctl restart isc-dhcp-server komutu çalıştırılarak servis yeniden başlatılmıştır. Güncel konfigürasyonu okuyan sunucu, yeni havuzu anında devreye almış ve Ankara'daki istemciler dinamik IP'lerini başarıyla çekmiştir.
+
+*Released: 07.07.2026*
+
+---
 ## 🚀 Sürüm: v0.5 - Dinamik Yönlendirme Omurgası, Kimlik Yönetimi ve Altyapı Optimizasyonu (The Dynamic Core)
 Bu sürümde, EmirNet ISP omurgası ile müşteri arasındaki statik ve hantal yönlendirme yapısı tamamen terk edilerek, endüstri standardı olan dinamik yönlendirme mimarisine geçiş yapılmıştır. Ağın ölçeklenebilirliği, güvenliği ve kararlılığı paket seviyesinde doğrulanmış; altyapı insan müdahalesine gerek duymadan kendi rotasını çizebilecek seviyeye ulaştırılmıştır.
 
