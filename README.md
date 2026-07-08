@@ -1,6 +1,6 @@
 # EmirNet-ISP-Project
 
-Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
+Sıfırdan adım adım inşa edilen, ölçeklenebilir ve gerçek dünya senaryolarını hedefleyen kurumsal ISP laboratuvarı.
 
 ---
 ## 🚀 Sürüm: v0.7 - Safkan ISP Mimarisi: eBGP/iBGP Ayrımı ve İleri Düzey Rota Yönetimi (The Pure Core)
