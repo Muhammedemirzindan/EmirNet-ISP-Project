@@ -3,6 +3,42 @@
 Sıfırdan adım adım inşa edilen devasa, yedekli ve otomatize edilmiş kurumsal bir ISP (İnternet Servis Sağlayıcı) ağ mimarisi projesidir. Proje, gelişim sürecine göre sürüm sürüm (v0.x) büyütülerek dökümante edilecektir.
 
 ---
+## 🚀 Sürüm: v0.7 - Safkan ISP Mimarisi: eBGP/iBGP Ayrımı ve İleri Düzey Rota Yönetimi (The Pure Core)
+
+Bu sürümde EmirNet, iç yönlendirme (IGP) ile dış yönlendirme (EGP) görevlerini birbirinden ayırarak gerçek servis sağlayıcı (ISP) mimarisine bir adım daha yaklaşmıştır. v0.5 sürümünde oluşturulan OSPF altyapısı yeniden tasarlanarak yalnızca ISP omurgasının (Core) iç yönlendirmesini sağlayacak şekilde sadeleştirilmiş, müşteri ağlarının taşınması ise tamamen Border Gateway Protocol (BGP) mimarisi üzerine aktarılmıştır. Böylece EmirNet, otonom sistem (AS) mantığıyla çalışan, ölçeklenebilir ve profesyonel bir yönlendirme mimarisine kavuşmuştur.
+
+### 🛠️ Bu Sürümde Neler Yapıldı?
+
+*   **Çekirdek Omurganın Yeniden Tasarlanması (Core Routing Optimization):** ISP omurgasının yalnızca altyapı ağlarını taşıması amacıyla müşteri IP blokları OSPF yönlendirme alanından tamamen çıkarılmıştır. OSPF; router'ların Loopback adreslerini ve omurga bağlantılarını taşıyan saf bir Interior Gateway Protocol (IGP) haline getirilmiş, müşteri rotalarının taşınması ise tamamen BGP'ye bırakılmıştır.
+
+*   **Dış Dünya Entegrasyonu (eBGP Neighbor Relationship):** İstanbul POP üzerindeki Provider Edge (PE) router ile müşteri Customer Edge (CE) router arasında eBGP komşuluğu kurulmuştur. Müşteri ağı kendi Autonomous System (AS) numarası üzerinden EmirNet omurgasına bağlanmış ve ağlarını BGP Network Advertisement mekanizması ile ISP'ye duyurmaya başlamıştır.
+
+*   **Şehirler Arası BGP Omurgası (iBGP Route Distribution):** İstanbul ve Ankara POP noktaları arasında iBGP komşuluğu oluşturulmuştur. İstanbul üzerinden öğrenilen müşteri rotaları, aynı Autonomous System içerisindeki diğer POP noktalarına iBGP aracılığıyla dağıtılarak çok şehirli servis sağlayıcı mimarisi oluşturulmuştur.
+
+*   **Loopback Tabanlı BGP Komşuluğu (Loopback Peering):** BGP komşuluklarının fiziksel bağlantılardan bağımsız olarak çalışabilmesi amacıyla router'lar üzerinde Loopback0 arayüzleri oluşturulmuştur. OSPF üzerinden taşınan Loopback adresleri kullanılarak iBGP oturumları kurulmuş, böylece ilerleyen sürümlerde eklenecek yedeklilik ve çoklu bağlantı senaryoları için altyapı hazırlanmıştır.
+
+
+### 📊 v0.7 Topoloji ve Doğrulama Hatları
+<img width="1076" height="766" alt="image" src="https://github.com/user-attachments/assets/1a79dd7b-8a75-4679-90d8-a78807a56633" />
+<img width="1914" height="875" alt="image" src="https://github.com/user-attachments/assets/871c11e4-e8fd-4dd9-824c-8e8ac118aa7f" />
+
+
+### 🧠 Karşılaşılan Sorunlar (Problems Encountered) - v0.7
+
+*   Sorun: eBGP üzerinden öğrenilen müşteri ağı İstanbul router'ına başarıyla ulaşmasına rağmen, Ankara POP noktasında yönlendirme tablosuna eklenmiyor ve BGP tablosunda RIB-Failure (r>) durumu oluşuyordu.
+
+*   Nedeni: Müşteri ağı daha önce OSPF üzerinden de ilan edildiği için Ankara router'ı aynı ağı hem OSPF hem de iBGP aracılığıyla öğreniyordu. Cisco IOS, yönlendirme tablosuna rota yerleştirirken Administrative Distance (AD) değerlerini dikkate aldığı için OSPF rotasını (AD 110) tercih ediyor, iBGP'den gelen aynı rotayı ise BGP tablosunda RIB-Failure durumuna düşürerek ana yönlendirme tablosuna eklemiyordu.
+
+*   Çözüm: Müşteri ağına ait tüm eski OSPF ilanları ISP omurgasından ve müşteri router'ından kaldırılmıştır. Böylece müşteri ağlarının taşınması tamamen BGP'ye devredilmiş ve protokoller arasında görev ayrımı sağlanmıştır. Ayrıca İstanbul PE router'ı üzerinde next-hop-self yapılandırılarak iBGP üzerinden dağıtılan rotaların Next-Hop bilgisi Ankara tarafından başarıyla çözülebilir hale getirilmiştir. Yapılan değişikliklerin ardından müşteri rotaları iBGP üzerinden başarılı şekilde yönlendirme tablosuna eklenmiş ve BGP tablosunda Valid & Best Path (*>) durumu doğrulanmıştır.
+
+### 🎯 Kazanımlar
+
+EmirNet v0.7 ile birlikte iç yönlendirme (IGP) ve dış yönlendirme (EGP) görevleri profesyonel servis sağlayıcı mimarisine uygun şekilde ayrıştırılmıştır. OSPF yalnızca ISP omurgasının yönlendirilmesinden sorumlu hale getirilirken, müşteri ağlarının taşınması tamamen BGP üzerinden gerçekleştirilmeye başlanmıştır.
+Bu sürümle birlikte EmirNet ilk kez kendi Autonomous System yapısı içerisinde çalışan, eBGP ve iBGP mimarisini aynı anda kullanan çok şehirli bir servis sağlayıcı omurgasına dönüşmüştür. Oluşturulan mimari, ilerleyen sürümlerde eklenecek HSRP, VRRP, MPLS ve gelişmiş trafik mühendisliği senaryoları için sağlam bir temel oluşturmuştur.
+
+*Released: 09.07.2026*
+
+---
 ## 🚀 Sürüm: v0.6 - Bölgesel Genişleme, Çok Şehirli Omurga ve Dağıtık Servis Entegrasyonu (The Distributed Core)
 Bu sürümde EmirNet, tek bir bölgede hizmet veren lokal bir ağ yapısından çıkarak şehirler arası (inter-city) hizmet sunabilen çok şehirli ve dağıtık bir ISP omurgasına dönüştürülmüştür. Altyapıya Ankara POP (Point of Presence) noktası eklenmiş, dinamik yönlendirme omurgası genişletilmiş ve merkezi servislerin uzak lokasyonlardaki istemcilere ulaştırılması paket seviyesinde doğrulanmıştır. Topolojinin büyümesiyle birlikte mimari tutarlılığı korumak amacıyla cihaz isimlendirme standartları (Naming Conventions) yeniden düzenlenmiştir.
 
